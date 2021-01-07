@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="description" content="Nano is a decentralized, secure, fast, and feeless cryptocurrency network. This site queries each of the below Public Nano Node APIs (from your browser) to give you a real-time view of the node's availability">
+        <meta name="nano" content="nano_3nahhuscs9ott91ynow4czt96nmwk8ugsw4k6acki36b4n5fcryuuk96mfrm" />
+
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+        <link rel="manifest" href="/site.webmanifest">
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <link href="https://unpkg.com/bootstrap-table@1.18.1/dist/bootstrap-table.min.css" rel="stylesheet">
+        <link href="/css/index.css" rel="stylesheet">
+
+        <title>Public Nano Nodes | SomeNano</title>
+    </head>
+    <body>
+
+    <div class="container">
+
+        <div class="jumbotron py-3">
+            <h1 class="display-4">Nano Public Nodes</h1>
+            <p class="lead">Public and free-to-use API to access the Nano network without hosting your own Nano node.</p>
+            <hr class="my-4">
+            <p></p>
+            <p>Nano is a decentralized, secure, fast, and feeless cryptocurrency network. This site queries each of the below Public Nano Node APIs (from your browser) to give you a real-time view of the node's availability.</p>
+            <p>If you want a simple wallet to receive and send Nano, see the <a href="https://nanowallets.guide/" target="_new">Unofficial Nano Wallets Guide</a>.</p>
+            <p>If you want more information on running your own Nano node (public or private) as well as more resources on building with Nano, check the <a href="https://nano.org/build" target="_new">Official Nano Website</a>.</p>
+            <p>If you want your node added to this list, <a href="mailto:info@somenano.com">email me</a> or find me on <a href="https://twitter.com/SomeNanoTweets">Twitter @SomeNanoTweets</a>.</p>
+        </div>
+
+        <div id="content">
+            <table
+                id="table"
+                data-toggle="table">
+
+                <thead>
+                    <tr>
+                        <th data-field="name" data-formatter="formatter_name" data-cell-style="name_cell_style" rowspan="2" data-sortable="true">Name</th>
+                        <th colspan="5">Tests</th>
+                        <th data-field="comment" rowspan="2" data-sortable="true">Comments</th>
+                    </tr>
+                    <tr>
+                        <th data-field="node_api_test_version" data-formatter="formatter_node_api_test_version" data-cell-style="test_cell_style" data-sortable="true">Node Version</th>
+                        <th data-field="node_api_test_blocks" data-formatter="formatter_node_api_test_blocks" data-cell-style="test_cell_style" data-sortable="true">Block Counts</th>
+                        <th data-field="node_api_test_process" data-formatter="formatter_node_api_test_process" data-cell-style="test_cell_style" data-sortable="true">API Supports<br>"process"</th>
+                        <th data-field="node_api_test_work" data-formatter="formatter_node_api_test_work" data-cell-style="test_cell_style" data-sortable="true">API Supports<br>"work_generate"</th>
+                        <th data-field="node_api_test_token" data-formatter="formatter_node_api_test_token" data-cell-style="test_cell_style" data-sortable="true">Token Limited</th>
+                        <!-- <th data-field="node_websockets_test_available" data-cell-style="test_cell_style" data-sortable="true">Websockets<br>Available</th>
+                        <th data-field="node_websockets_test_voting" data-cell-style="test_cell_style" data-sortable="true">Websockets<br>Voting</th> -->
+                        
+                    </tr>
+                </thead>
+
+            </table>
+        </div>
+
+        <h3 class="mt-3">More Information</h4>
+
+        <div id="accordion">
+            <div class="card">
+              <div class="card-header" id="headingOne">
+                <h5 class="mb-0">
+                  <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    What are these tests?
+                  </button>
+                </h5>
+              </div>
+          
+              <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+                <div class="card-body">
+                    <p><span class="font-weight-bold">Node Version:</span> Queries the node with <a href="https://docs.nano.org/commands/rpc-protocol/#version" target="_new">action: version</a> and compares against latest version of the <a href="https://github.com/nanocurrency/nano-node/releases" target="_new">Nano Node</a>.</p>
+                    <p><span class="font-weight-bold">Block Counts:</span> Queries the node with <a href="https://docs.nano.org/commands/rpc-protocol/#block_count" target="_new">action: block_count</a> and checks for uncomfirmed blocks. If there are a lot of unconfirmed blocks (see <a href="/js/node_tests.js" target="_new">node_tests.js</a> for specifics) the test fails. If there are only a few unconfirmed, the test is a partial success.</p>
+                    <p><span class="font-weight-bold">API Supports "process":</span> Queries the node with <a href="https://docs.nano.org/commands/rpc-protocol/#process" target="_new">action: process</a> and checks that the node returns an error message indicating it attempted to process the block. I am not attempting to broadcast legitimate blocks for these tests.</p>
+                    <p><span class="font-weight-bold">API Supports "work_generate":</span> Queries the node with <a href="https://docs.nano.org/commands/rpc-protocol/#work_generate" target="_new">action: work_generate</a> and checks for a returned work value. Many public nodes won't support this action because of the processing power costs. Some that allow limit requests via tokens/time will charge more than for a work_generate call than any other.</p>
+                    <p><span class="font-weight-bold">Token Limited:</span> Queries the node with an arbitrary action and looks to see if a known token system is in use. Some public nodes use tokens (likely those that have implemented the <a href="https://github.com/Joohansson/NanoRPCProxy" target="_new">NanoRPCProxy</a> to prevent abuse of their free-to-use public node. In this test I check for the response data to include a value for requestsLimit.</p>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header" id="headingTwo">
+                <h5 class="mb-0">
+                  <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    Resources for "Getting Started"
+                  </button>
+                </h5>
+              </div>
+              <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+                <div class="card-body">
+                    <p>Here are some resources that will help you BUIDL/develop/code with Nano. This is certainly not a comprehensive list. It is mainly resources/tools that I have personally used and think provide the most value for people just getting into developing with Nano.</p>
+                    <p>
+                        <ul>
+                            <li><a href="https://nano.org/build" target="_new">Official nano.org</a>: Developer resources from the Nano Foundation.</li>
+                            <li><a href="https://docs.nano.org/" target="_new">Nano Documentation</a>: If you are interacting with a Nano node, this is the documentation you need to be reading.</li>
+                            <li><a href="https://nano.org/tools" target="_new">Nano Tools</a>: A phenomenal list of tools (many of which are on this list) that will help you integrate Nano in whatever environment you are developing.</li>
+                            <li><a href="https://github.com/nanocurrency" target="_new">Nano on Github</a>: All official releases of nodes/work servers/etc are found on the Github.</li>
+                            <li><a href="https://tools.nanos.cc/" target="_new">KeyTools</a>: A wide variety of tools that are useful for learning about how the Nano protocol works. These tools can be used offline as well.</li>
+                            <li><a href="https://nanoo.tools/" target="_new">nanoo.tools</a>: Another wide variety of tools that are useful for learning about how the Nano protocol works. Includes an <a href="https://nanoo.tools/nano-rpc-playground" target="_new">RPC Playground</a> that will let you query a public node (similar to how tests on this page are run).</li>
+                            <li><a href="https://github.com/appditto/pippin_nano_wallet" target="_new">Pippin Nano Wallet</a>: Advertised as a "production-ready, high-performance developer wallet", this service can be used to as middleware to interact with your node or a public node. It provides wallet features such as send/receive and account management. While a Nano node allows you to interact with the network, a wallet is what maintains the state of your accounts.</li>
+                            <li><a href="https://github.com/guilhermelawless/nano-dpow" target="_new">Nano DPoW</a>: Nano uses a hashing/proof of work system to combat spam in the network. While the POW is minimal compared to other cryptocurrencies, if you are developing on a minimum specs VPS/RPI/etc, you may not want to waste time calculating proof of work on your own. DPoW is a service that is free for non-commercial use, integrates seamlessly into Pippin, and provides a pool of GPU workers to give near instant POW actions. Great for hobby or just getting started.</li>
+                        </ul>
+                    </p>
+                    <p>If you have resources you think I should add, <a href="mailto:info@somenano.com">email me</a> or find me on <a href="https://twitter.com/SomeNanoTweets">Twitter @SomeNanoTweets</a></p>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header" id="headingThree">
+                <h5 class="mb-0">
+                  <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                    This site is awesome, can I give you a donation?
+                  </button>
+                </h5>
+              </div>
+              <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
+                <div class="card-body">
+                    <p>Aww, thanks for the kind words.</p>
+                    <p>I will gratefully allow you to buy me a beer. If you are so inclined, please donate here: <a href="https://nanocrawler.cc/explorer/account/nano_3nahhuscs9ott91ynow4czt96nmwk8ugsw4k6acki36b4n5fcryuuk96mfrm/history" target="_new">nano_3nahhuscs9ott91ynow4czt96nmwk8ugsw4k6acki36b4n5fcryuuk96mfrm</a></p>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+                <div class="card-header" id="headingFour">
+                  <h5 class="mb-0">
+                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                      Todo list
+                    </button>
+                  </h5>
+                </div>
+                <div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-parent="#accordion">
+                  <div class="card-body">
+                      <p>So many side projects, and this is one of them. Here are some of the "todo" items for this site...</p>
+                      <p>
+                          <ul>
+                              <li>Make it prettier (help?)</li>
+                              <li>Add an RPC Playground</li>
+                              <li>Add node WebSocket testing</li>
+                              <li>Expand the number of actions tested</li>
+                              <li>Integrate a faucet to enable testing with funds</li>
+                              <li>Provide better "benchmark" testing</li>
+                          </ul>
+                      </p>
+                  </div>
+                </div>
+              </div>
+          </div>
+
+        <footer class="pt-4 my-md-5 pt-md-5 border-top">
+            <div class="row">
+                <div class="col-12 col-md">
+                <img class="mb-2" src="/somenano.svg" alt="" width="24" height="24">
+                <small class="d-block mb-3 text-muted">© 2021 SomeNano</small>
+                </div>
+                <div class="col-6 col-md">
+                <h5>More of my sites</h5>
+                <ul class="list-unstyled text-small">
+                    <li><a class="text-muted" target="_new" href="https://snow.somenano.com">SomeNano Snow</a></li>
+                    <li><a class="text-muted" target="_new" href="https://plinko.somenano.com">SomeNano Plinko</a></li>
+                    <li><a class="text-muted" target="_new" href="https://marketcapcompare.com">MarketCapCompare.com</a></li>
+                </ul>
+                </div>
+                <div class="col-6 col-md">
+                <h5>Contact</h5>
+                <ul class="list-unstyled text-small">
+                    <li><a class="text-muted" href="https://twitter.com/SomeNanoTweets">@SomeNanoTweets</a></li>
+                    <li><a class="text-muted" href="mailto:jason@somenano.com">jason@somenano.com</a> (<a class="text-muted" href="https://somenano.com/keys/publickey.jason@somenano.com.asc">PGP</a>)</li>
+                </ul>
+                </div>
+                <div class="col-6 col-md">
+                <h5>About</h5>
+                <ul class="list-unstyled text-small">
+                    <li><a class="text-muted" href="https://github.com/somenano/publicnodes.somenano.com">Open Source</a></li>
+                </ul>
+                </div>
+            </div>
+            </footer>
+
+    </div>
+
+    <script>
+        if (window.navigator.userAgent.match(/(MSIE|Trident)/)) {
+            // IE detected...
+            document.getElementById('content').innerHTML = '<div class="alert alert-danger" role="alert">Hello, it looks as though you are running Internet Explorer. This site only works with modern browsers. Please switch to Chrome/Firefox/Brave.</div>';
+        }
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/bootstrap-table@1.18.1/dist/bootstrap-table.min.js"></script>
+    
+    <script src="/js/public_nodes.js"></script>
+    <script src="/js/nano_node.js"></script>
+    <script src="/js/node_tests.js"></script>
+    <script src="/js/formatter.js"></script>
+    <script src="/js/index.js"></script>
+</body>
+</html>
