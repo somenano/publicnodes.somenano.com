@@ -76,7 +76,13 @@ Node.post = function(url, params, success_cb, fail_cb) {
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
-            success_cb(JSON.parse(this.responseText));
+            try {
+                success_cb(JSON.parse(this.responseText));
+            } catch(e) {
+                console.error('Failed to parse response from node');
+                console.error(this.responseText);
+                fail_cb(this);
+            }
         } else if (this.readyState == 4 && this.status != 200) {
             fail_cb(this);
         }
