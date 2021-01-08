@@ -2,10 +2,10 @@
 
 const public_nodes = [
     {
-    name: 'Nanos.cc',
+        name: 'Nanos.cc',
         url: 'https://nault.nanos.cc/proxy',
         ws: 'wss://nault-ws.nanos.cc',
-        comment: ''
+        comment: '<a href="https://twitter.com/nano_links" target="_new">@nano_links</a>'
     },
     {
         name: 'VoxPopuli',
@@ -17,7 +17,7 @@ const public_nodes = [
         name: 'My Nano Ninja',
         url: 'https://mynano.ninja/api/node',
         ws: 'wss://ws.mynano.ninja',
-        comment: ''
+        comment: '<a href="https://twitter.com/mynanoninja" target="_new">MyNanoNinja</a>'
     },
     {
         name: 'Nanex.cc',
@@ -29,6 +29,6 @@ const public_nodes = [
         name: 'NanoCrawler',
         url: 'https://vault.nanocrawler.cc/api/node-api',
         ws: undefined,
-        comment: ''
+        comment: '<a href="https://twitter.com/meltingice" target="_new">@MeltingIce</a>'
     }
 ]

@@ -13,6 +13,7 @@ function update_table_test(node, results) {
     }
 
     if (!updated) {
+        console.log(node);
         let data = {
             name: node.name,
             url: node.url,
@@ -31,6 +32,7 @@ function data_refresh() {
     for (let public_node of public_nodes) {
 
         let node = new Node(public_node.name, public_node.url, public_node.ws);
+        node.comment = public_node.comment;
 
         ///////////////
         // node_api_test_version

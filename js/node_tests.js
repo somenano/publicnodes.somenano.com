@@ -17,8 +17,10 @@ const TEST_WORK = 'cab7404f0b5449d0';
 const TEST_SCORE = {
     'error': -1,
     'fail': 0,
-    'partial': 1,
-    'pass': 2
+    'limited': 1,
+    'not-allowed': 2,
+    'partial': 3,
+    'pass': 4
 }
 const FAILED_NODE_COMMS_STRING = 'Test failed due to failed communication with node API';
 
@@ -34,6 +36,7 @@ function translate_test_score_to_string(test_score) {
 
     if (test_score == TEST_SCORE['pass']) results_string = 'Test completed successfully with status: PASS';
     else if (test_score == TEST_SCORE['partial']) results_string = 'Test completed successfully with status: PARTIAL PASS';
+    else if (test_score == TEST_SCORE['limited']) results_string = 'Test did not complete successfully due to the node limiting the number of requests you send';
     else if (test_score == TEST_SCORE['fail']) results_string = 'Test completed successfully with status: FAIL';
     else if (test_score == TEST_SCORE['error']) results_string = 'Test did not complete successfully';
 
@@ -86,11 +89,7 @@ function node_api_test(node, test_name, api_promise, validation_function) {
 
         api_promise.then(function(response) {
 
-            let test_score = TEST_SCORE['error'];
-
-            if (response.success) {
-                test_score = validation_function(response.data);
-            }
+            let test_score = validation_function(response.data);
 
             let date_complete = new Date();
             let test_duration = date_complete - date_start;
@@ -112,6 +111,8 @@ function node_api_test(node, test_name, api_promise, validation_function) {
 
 function node_api_test_version(node) {
     return node_api_test(node, 'node_api_test_version', node.version(), function(data) {
+        if (data.status == 429 || data.requestsRemaining == 0) return TEST_SCORE['limited'];   // Too many requests
+        if (data.status !== undefined) return TEST_SCORE['error'];
         if (data.node_vendor === undefined && data.requestsLimit === undefined) return TEST_SCORE['error'];
         if (data.node_vendor == CURRENT_NODE_VENDOR) return TEST_SCORE['pass'];
         return TEST_SCORE['partial'];
@@ -120,6 +121,8 @@ function node_api_test_version(node) {
 
 function node_api_test_blocks(node) {
     return node_api_test(node, 'node_api_test_blocks', node.block_count(), function(data) {
+        if (data.status == 429 || data.requestsRemaining == 0) return TEST_SCORE['limited'];   // Too many requests
+        if (data.status !== undefined) return TEST_SCORE['error'];
         if (data.unchecked === undefined && data.requestsLimit === undefined) return TEST_SCORE['error'];
         if (Number(data.unchecked) > UNCHECKED_BLOCKS_FAIL) return TEST_SCORE['fail'];
         if (Number(data.unchecked) > UNCHECKED_BLOCKS_PARTIAL) return TEST_SCORE['partial'];
@@ -130,6 +133,8 @@ function node_api_test_blocks(node) {
 function node_api_test_process(node) {
     const block = Node.block('send', TEST_INVALID_ACCOUNT, TEST_HASH, TEST_INVALID_ACCOUNT, '0', TEST_HASH, TEST_INVALID_ACCOUNT, TEST_SIGNATURE, TEST_WORK)
     return node_api_test(node, 'node_api_test_process', node.process(true, 'send', block), function(data) {
+        if (data.status == 429 || data.requestsRemaining == 0) return TEST_SCORE['limited'];   // Too many requests
+        if (data.status !== undefined) return TEST_SCORE['error'];
         if (data.hash === undefined && data.error === undefined && data.requestsLimit === undefined) return TEST_SCORE['error'];
         if (data.error == 'Block is invalid') return TEST_SCORE['pass'];
         return TEST_SCORE['fail'];
@@ -138,6 +143,8 @@ function node_api_test_process(node) {
 
 function node_api_test_work(node) {
     return node_api_test(node, 'node_api_test_work', node.work_generate(TEST_HASH), function(data) {
+        if (data.status == 429 || data.requestsRemaining == 0) return TEST_SCORE['limited'];   // Too many requests
+        if (data.status !== undefined) return TEST_SCORE['error'];
         if (data.work === undefined && data.error === undefined && data.requestsLimit === undefined) return TEST_SCORE['error'];
         if (data.work !== undefined) return TEST_SCORE['pass'];
         return TEST_SCORE['fail'];
@@ -146,6 +153,8 @@ function node_api_test_work(node) {
 
 function node_api_test_token(node) {
     return node_api_test(node, 'node_api_test_token', node.block_count(), function(data) {
+        if (data.status == 429 || data.requestsRemaining == 0) return TEST_SCORE['limited'];   // Too many requests
+        if (data.status !== undefined) return TEST_SCORE['error'];
         if (data.unchecked === undefined && data.requestsLimit === undefined) return TEST_SCORE['error'];
         if (data.requestsLimit !== undefined) return TEST_SCORE['pass'];
         return TEST_SCORE['fail'];

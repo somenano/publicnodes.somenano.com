@@ -7,19 +7,65 @@ function formatter_name(value, row, index) {
     return ret;
 }
 
-function formatter_node_api_test_version(value, row, index) {
+function formatter_comment(value, row, index) {
     if (value === undefined) return undefined;
-    if (value.test_score == TEST_SCORE['error']) {
-        return '<div class="fs-0-7">Error' + (value.test_duration !== undefined ? '</div><div class="tiny-muted">' + value.test_duration + ' ms' : '') + '</div>';
+    let ret = '<div class="fs-0-7">' + value + '</div>';
+    return ret;
+}
+
+function error_message(value) {
+    let ret = '<div class="fs-0-7">Error</div>';
+    
+    if (value.test_data.timeout !== undefined && value.test_duration !== undefined && value.test_data.status == 0 && value.test_data.timeout <= value.test_duration) {
+        ret += '<div class="fs-0-5">Test timed out</div>';
     }
+    else if (value.test_data.status == 500) {
+        // Check for error or message property in responseText
+        try {
+            let data = JSON.parse(value.test_data.responseText);
+            if (data.error !== undefined) ret += '<div class="fs-0-5">' + data.error + '</div>';
+            else if (data.message !== undefined) ret += '<div class="fs-0-5">' + data.message + '</div>';
+            else throw 'no message';
+        } catch(e) {
+            // Unable to parse message
+            ret += '<div class="fs-0-5">Returned HTTP 500</div>';
+        }
+    } else {
+        ret += '<div class="fs-0-5">Returned HTTP ' + value.test_data.status + '</div>';
+    }
+
+
+    if (value.test_duration !== undefined) {
+        ret += '<div class="tiny-muted">' + value.test_duration + ' ms';
+    }
+    return ret;
+}
+
+function limited_message(value) {
+    return '<div class="fs-0-7">This node is rate limiting your requests, try again later</div>';
+}
+
+function formatter_node_api_test_version(value, row, index) {
+    if (value === undefined) return '<div class="text-center"><img src="/images/nano.gif" height="32px" width="43px"></div><div class="text-center tiny-muted">Running test...</div>';
+    if (value.test_score == TEST_SCORE['error']) {
+        return error_message(value);
+    }
+    if (value.test_score == TEST_SCORE['limited']) {
+        return limited_message(value);
+    }
+
     return '<div class="fs-0-7">' + value.test_data.node_vendor + '</div><div class="tiny-muted">' + value.test_duration + ' ms</div>';
 }
 
 function formatter_node_api_test_blocks(value, row, index) {
-    if (value === undefined) return undefined;
+    if (value === undefined) return '<div class="text-center"><img src="/images/nano.gif" height="32px" width="43px"></div><div class="text-center tiny-muted">Running test...</div>';
     if (value.test_score == TEST_SCORE['error']) {
-        return '<div class="fs-0-7">Error' + (value.test_duration !== undefined ? '</div><div class="tiny-muted">' + value.test_duration + ' ms' : '') + '</div>';
+        return error_message(value);
     }
+    if (value.test_score == TEST_SCORE['limited']) {
+        return limited_message(value);
+    }
+
     let ret = '<div class="fs-0-7">Count: ' + (value.test_data.count !== undefined ? value.test_data.count : 'Unknown');
     ret += '<br>Unchecked: ' + (value.test_data.unchecked !== undefined ? value.test_data.unchecked : 'Unknown');
     ret += '<br>Uncemented: ' + (value.test_data.cemented !== undefined && value.test_data.count !== undefined ? value.test_data.count - value.test_data.cemented : 'Unknown') + '</div>';
@@ -28,9 +74,12 @@ function formatter_node_api_test_blocks(value, row, index) {
 }
 
 function formatter_node_api_test_process(value, row, index) {
-    if (value === undefined) return undefined;
+    if (value === undefined) return '<div class="text-center"><img src="/images/nano.gif" height="32px" width="43px"></div><div class="text-center tiny-muted">Running test...</div>';
     if (value.test_score == TEST_SCORE['error']) {
-        return '<div class="fs-0-7">Error' + (value.test_duration !== undefined ? '</div><div class="tiny-muted">' + value.test_duration + ' ms' : '') + '</div>';
+        return error_message(value);
+    }
+    if (value.test_score == TEST_SCORE['limited']) {
+        return limited_message(value);
     }
     
     let ret = '<div class="fs-0-7">';
@@ -41,9 +90,12 @@ function formatter_node_api_test_process(value, row, index) {
 }
 
 function formatter_node_api_test_work(value, row, index) {
-    if (value === undefined) return undefined;
+    if (value === undefined) return '<div class="text-center"><img src="/images/nano.gif" height="32px" width="43px"></div><div class="text-center tiny-muted">Running test...</div>';
     if (value.test_score == TEST_SCORE['error']) {
-        return '<div class="fs-0-7">Error' + (value.test_duration !== undefined ? '</div><div class="tiny-muted">' + value.test_duration + ' ms' : '') + '</div>';
+        return error_message(value);
+    }
+    if (value.test_score == TEST_SCORE['limited']) {
+        return limited_message(value);
     }
 
     let ret = '<div class="fs-0-7">';
@@ -54,9 +106,12 @@ function formatter_node_api_test_work(value, row, index) {
 }
 
 function formatter_node_api_test_token(value, row, index) {
-    if (value === undefined) return undefined;
+    if (value === undefined) return '<div class="text-center"><img src="/images/nano.gif" height="32px" width="43px"></div><div class="text-center tiny-muted">Running test...</div>';
     if (value.test_score == TEST_SCORE['error']) {
-        return '<div>Error' + (value.test_duration !== undefined ? '</div><div class="tiny-muted">' + value.test_duration + ' ms' : '') + '</div>';
+        return error_message(value);
+    }
+    if (value.test_score == TEST_SCORE['limited']) {
+        return limited_message(value);
     }
 
     let ret = '<div class="fs-0-7">';
@@ -74,11 +129,19 @@ function test_cell_style(value, row, index) {
         'node_api_test_token',
     ]
 
-    if (value === undefined) return {};
+    if (value === undefined) return {
+        classes: 'text-center',
+    };
 
     if (value.test_score == TEST_SCORE['error']) {
         return {
             classes: 'table-danger text-center',
+        }
+    }
+
+    if (value.test_score == TEST_SCORE['limited']) {
+        return {
+            classes: 'text-center',
         }
     }
 
@@ -104,7 +167,9 @@ function test_cell_style(value, row, index) {
             classes: 'table-success text-center',
         }
     }
-    return {}
+    return {
+        classes: 'text-center',
+    }
 }
 
 function name_cell_style(value, row, index) {

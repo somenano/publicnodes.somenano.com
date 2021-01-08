@@ -1,4 +1,8 @@
-// TODO: banner
+///////////////////////
+// Config
+REQUEST_TIMEOUT = 10*1000;   // 10 seconds
+
+///////////////////////
 
 class Node {
     constructor(name=undefined, url=undefined, ws=undefined, comment=undefined) {
@@ -7,7 +11,7 @@ class Node {
         this.ws = ws;
     }
 
-    api(params, property_to_validate=undefined) {
+    api(params) {
         return new Promise((resolve, reject) => {
             let date_start = new Date();
             Node.post(this.url, params, function(data) {
@@ -37,13 +41,13 @@ class Node {
     version() {
         return this.api({
             action: 'version'
-        }, 'node_vendor');
+        });
     }
 
     block_count() {
         return this.api({
             action: 'block_count'
-        }, 'count');
+        });
     }
 
     process(json_block, subtype, block) {
@@ -52,14 +56,14 @@ class Node {
             'json_block': json_block,
             'subtype': subtype,
             'block': block
-        }, 'hash');
+        });
     }
 
     work_generate(hash) {
         return this.api({
             'action': 'work_generate',
             'hash': hash
-        }, 'work');
+        });
     }
 }
 
@@ -74,6 +78,7 @@ Node.post = function(url, params, success_cb, fail_cb) {
      */
 
     let xhttp = new XMLHttpRequest();
+    xhttp.timeout = REQUEST_TIMEOUT;
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
             try {
