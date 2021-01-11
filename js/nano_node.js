@@ -4,17 +4,17 @@ REQUEST_TIMEOUT = 10*1000;   // 10 seconds
 
 ///////////////////////
 
-class Node {
-    constructor(name=undefined, url=undefined, ws=undefined, comment=undefined) {
-        this.name = name;
+const genRanHex = size => [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join(''); // https://stackoverflow.com/a/58326357
+
+class NodeAPI {
+    constructor(url) {
         this.url = url;
-        this.ws = ws;
     }
 
-    api(params) {
+    call(params) {
         return new Promise((resolve, reject) => {
             let date_start = new Date();
-            Node.post(this.url, params, function(data) {
+            NodeAPI.post(this.url, params, function(data) {
                 // Request returned HTTP 200
                 let date_complete = new Date();
                 resolve({
@@ -39,19 +39,19 @@ class Node {
     }
 
     version() {
-        return this.api({
+        return this.call({
             action: 'version'
         });
     }
 
     block_count() {
-        return this.api({
+        return this.call({
             action: 'block_count'
         });
     }
 
     process(json_block, subtype, block) {
-        return this.api({
+        return this.call({
             'action': 'process',
             'json_block': json_block,
             'subtype': subtype,
@@ -60,14 +60,14 @@ class Node {
     }
 
     work_generate(hash) {
-        return this.api({
+        return this.call({
             'action': 'work_generate',
             'hash': hash
         });
     }
 }
 
-Node.post = function(url, params, success_cb, fail_cb) {
+NodeAPI.post = function(url, params, success_cb, fail_cb) {
     /* Sends POST request
      *  Arguments
      *   url: target of POST request
@@ -99,7 +99,7 @@ Node.post = function(url, params, success_cb, fail_cb) {
     return undefined;
 }
 
-Node.block = function(type, account, previous, representative, balance, link, link_as_account, signature, work) {
+NodeAPI.block = function(type, account, previous, representative, balance, link, link_as_account, signature, work) {
     return {
         type: type,
         account: account,
@@ -112,3 +112,183 @@ Node.block = function(type, account, previous, representative, balance, link, li
         work: work
     }
 }
+
+class NodeWebSocket {
+    constructor(url, message_handler) {
+        this.url = url;
+        this.message_handler = message_handler;
+        this.failed = false;
+        this.socket_callbacks = {};
+        try {
+            this.socket = new WebSocket(this.url);
+            this.socket.onopen = () => { this.onopen() };
+            this.socket.onmessage = (data) => { this.onmessage(data); }
+            this.socket.onerror = (error) => { this.onerror(error); }
+
+            this.setupTimeout = setTimeout(() => {
+                if (!this.isready()) {
+                    console.error('Attempt to set up WebSocket failed with url: '+ this.url);
+                    this.socket = undefined;
+                    this.failed = true;
+                }
+            }, REQUEST_TIMEOUT);
+        } catch(error) {
+            console.error('Failed attempting to set up socket to '+ this.url);
+            this.socket = undefined;
+            this.failed = true;
+        }
+    }
+
+    setup_promise() {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                if (this.isready() == true) {
+                    resolve(true);
+                    return;
+                } else if (this.failed == true) {
+                    resolve(false);
+                    return;
+                }
+                resolve(this.setup_promise());
+                return;
+            }, (REQUEST_TIMEOUT) / 20);
+        });
+    }
+
+    isready() {
+        return (this.socket !== undefined && this.socket.readyState == 1);
+    }
+
+    onopen() {
+        clearTimeout(this.setupTimeout);
+        this.setupTimeout = undefined;
+    }
+
+    onerror() {
+        clearTimeout(this.setupTimeout);
+        this.failed = true;
+    }
+
+    onmessage(response) {
+        try {
+            let data = JSON.parse(response.data);
+            
+            if (data.id !== undefined && Object.keys(this.socket_callbacks).indexOf(data.id) > -1) {
+                // Callback found
+                clearTimeout(this.socket_callbacks[data.id].timeout);
+                this.socket_callbacks[data.id].cb({success: true, data: data});
+                delete this.socket_callbacks[data.id];
+                return;
+            }
+
+            if (this.message_handler !== undefined) {
+                this.message_handler(data);
+            }
+        
+        } catch(err) {
+            console.error('In socket.onmessage, an error was returned');
+            console.error(err);
+        }
+    }
+
+    send_action(params, cb=undefined) {
+        
+        if (!this.isready()) return false;
+        if (cb !== undefined) {
+            params.id = genRanHex(8);
+            let timeout = setTimeout(() => {
+                cb({success: false, data: {}, message: 'action timed out'});
+                delete this.socket_callbacks[params.id];
+            }, REQUEST_TIMEOUT);
+            this.socket_callbacks[params.id] = {
+                cb: cb,
+                timeout: timeout
+            };
+        }
+        
+        return this.socket.send(JSON.stringify(params));
+
+    }
+
+    ping(cb) {
+        let input = {
+            action: 'ping'
+        }
+        return this.send_action(input, cb);
+    }
+
+    subscribe_all(cb, confirmation_type='active') {
+        let input = {
+            action: 'subscribe',
+            topic: 'confirmation',
+            ack: true,
+            options: {
+                confirmation_type: confirmation_type
+            }
+        }
+
+        return this.send_action(input, cb);
+    }
+
+    subscribe_addresses(addresses, cb, confirmation_type='active') {
+        let input = {
+            action: 'subscribe',
+            topic: 'confirmation',
+            ack: true,
+            options: {
+                accounts: addresses,
+                confirmation_type: confirmation_type
+            }
+        }
+    
+        return this.send_action(input, cb);
+    }
+
+    unsubscribe_all(cb) {
+        let input = {
+            action: 'unsubscribe',
+            topic: 'confirmation',
+            ack: true,
+        }
+
+        return this.send_action(input, cb);
+    }
+
+    unsubscribe_addresses(addresses, cb) {
+        let input = {
+            action: 'unsubscribe',
+            topic: 'confirmation',
+            ack: true,
+            options: {
+                accounts: addresses
+            }
+        }
+    
+        return this.send_action(input, cb);
+    }
+
+    update_addresses(addresses_add, addresses_del, cb) {
+        let input = {
+            action: 'update',
+            topic: 'confirmation',
+            ack: true,
+            options: {
+                accounts_add: addresses_add,
+                accounts_del: addresses_del
+            }
+        }
+    
+        return this.send_action(input, cb);
+    }
+}
+
+class Node {
+    constructor(name, api_url, websocket_url, websocket_message_handler) {
+        this.name = name;
+        this.api = undefined;
+        if (api_url !== undefined) this.api = new NodeAPI(api_url);
+        this.websocket = undefined;
+        if (websocket_url !== undefined) this.websocket = new NodeWebSocket(websocket_url, websocket_message_handler);
+    }
+}
+

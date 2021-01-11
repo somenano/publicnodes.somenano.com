@@ -43,7 +43,7 @@ function translate_test_score_to_string(test_score) {
     return results_string;
 }
 
-function node_api_test_error(node, test_name, test_duration, error) {
+function node_test_error(node, test_name, test_duration, error) {
     // Log error to console
     console.error('' + node.name + ' ran test: ' + test_name);
     console.error(' Test duration: ' + test_duration + ' milliseconds')
@@ -58,7 +58,7 @@ function node_api_test_error(node, test_name, test_duration, error) {
     }
 }
 
-function node_api_test_complete(node, test_name, test_duration, test_score, data) {
+function node_test_complete(node, test_name, test_duration, test_score, data) {
     const test_data = {
         node: node,
         test_name: test_name,
@@ -94,7 +94,7 @@ function node_api_test(node, test_name, api_promise, validation_function) {
             let date_complete = new Date();
             let test_duration = date_complete - date_start;
 
-            resolve(node_api_test_complete(node, test_name, test_duration, test_score, response.data));
+            resolve(node_test_complete(node, test_name, test_duration, test_score, response.data));
             return;
         })
         .catch(function(error) {
@@ -103,14 +103,14 @@ function node_api_test(node, test_name, api_promise, validation_function) {
             let date_complete = new Date();
             let test_duration = date_complete - date_start;
             
-            resolve(node_api_test_error(node, test_name, test_duration, error));
+            resolve(node_test_error(node, test_name, test_duration, error));
             return;
         });
     });
 }
 
 function node_api_test_version(node) {
-    return node_api_test(node, 'node_api_test_version', node.version(), function(data) {
+    return node_api_test(node, 'node_api_test_version', node.api.version(), function(data) {
         if (data.status == 429 || data.requestsRemaining == 0) return TEST_SCORE['limited'];   // Too many requests
         if (data.status !== undefined) return TEST_SCORE['error'];
         if (data.node_vendor === undefined && data.requestsLimit === undefined) return TEST_SCORE['error'];
@@ -120,7 +120,7 @@ function node_api_test_version(node) {
 }
 
 function node_api_test_blocks(node) {
-    return node_api_test(node, 'node_api_test_blocks', node.block_count(), function(data) {
+    return node_api_test(node, 'node_api_test_blocks', node.api.block_count(), function(data) {
         if (data.status == 429 || data.requestsRemaining == 0) return TEST_SCORE['limited'];   // Too many requests
         if (data.status !== undefined) return TEST_SCORE['error'];
         if (data.unchecked === undefined && data.requestsLimit === undefined) return TEST_SCORE['error'];
@@ -131,8 +131,8 @@ function node_api_test_blocks(node) {
 }
 
 function node_api_test_process(node) {
-    const block = Node.block('send', TEST_INVALID_ACCOUNT, TEST_HASH, TEST_INVALID_ACCOUNT, '0', TEST_HASH, TEST_INVALID_ACCOUNT, TEST_SIGNATURE, TEST_WORK)
-    return node_api_test(node, 'node_api_test_process', node.process(true, 'send', block), function(data) {
+    const block = NodeAPI.block('send', TEST_INVALID_ACCOUNT, TEST_HASH, TEST_INVALID_ACCOUNT, '0', TEST_HASH, TEST_INVALID_ACCOUNT, TEST_SIGNATURE, TEST_WORK)
+    return node_api_test(node, 'node_api_test_process', node.api.process(true, 'send', block), function(data) {
         if (data.status == 429 || data.requestsRemaining == 0) return TEST_SCORE['limited'];   // Too many requests
         if (data.status !== undefined) return TEST_SCORE['error'];
         if (data.hash === undefined && data.error === undefined && data.requestsLimit === undefined) return TEST_SCORE['error'];
@@ -142,7 +142,7 @@ function node_api_test_process(node) {
 }
 
 function node_api_test_work(node) {
-    return node_api_test(node, 'node_api_test_work', node.work_generate(TEST_HASH), function(data) {
+    return node_api_test(node, 'node_api_test_work', node.api.work_generate(TEST_HASH), function(data) {
         if (data.status == 429 || data.requestsRemaining == 0) return TEST_SCORE['limited'];   // Too many requests
         if (data.status !== undefined) return TEST_SCORE['error'];
         if (data.work === undefined && data.error === undefined && data.requestsLimit === undefined) return TEST_SCORE['error'];
@@ -152,11 +152,117 @@ function node_api_test_work(node) {
 }
 
 function node_api_test_token(node) {
-    return node_api_test(node, 'node_api_test_token', node.block_count(), function(data) {
+    return node_api_test(node, 'node_api_test_token', node.api.block_count(), function(data) {
         if (data.status == 429 || data.requestsRemaining == 0) return TEST_SCORE['limited'];   // Too many requests
         if (data.status !== undefined) return TEST_SCORE['error'];
         if (data.unchecked === undefined && data.requestsLimit === undefined) return TEST_SCORE['error'];
         if (data.requestsLimit !== undefined) return TEST_SCORE['pass'];
         return TEST_SCORE['fail'];
+    });
+}
+
+function node_websocket_test_setup(node) {
+    return new Promise(async (resolve, reject) => {
+        const date_start = new Date();
+        const test_name = 'node_websocket_test_setup';
+        try {
+            let success = await node.websocket.setup_promise();
+            let test_score = TEST_SCORE['fail'];
+            if (success == true) {
+                test_score = TEST_SCORE['pass'];
+            }
+            resolve(node_test_complete(node, test_name, (new Date() - date_start), test_score, {}));
+            return;
+        } catch(error) {
+            resolve(node_test_error(node, test_name, (new Date() - date_start), error));
+            return;
+        }
+    });
+}
+
+function node_websocket_test_ping(node) {
+    return new Promise(async (resolve, reject) => {
+        let date_start = new Date();
+        const test_name = 'node_websocket_test_ping';
+        try {
+            let setup_success = await node.websocket.setup_promise();
+            if (setup_success != true) {
+                resolve(node_test_complete(node, test_name, (new Date() - date_start), TEST_SCORE['fail'], response.data));
+                return;
+            }
+            date_start = new Date();
+            node.websocket.ping((response) => {
+                let test_score = TEST_SCORE['fail'];
+                if (response.success == false && response.message !== undefined && response.data !== undefined && response.data.message === undefined) {
+                    response.data.message = response.message;
+                }
+                if (response.success == true && response.data) test_score = TEST_SCORE['pass'];
+                resolve(node_test_complete(node, test_name, (new Date() - date_start), test_score, response.data));
+                return;
+            });
+        } catch(error) {
+            resolve(node_test_error(node, test_name, (new Date() - date_start), error));
+            return;
+        }
+    });
+}
+
+function node_websocket_test_subscribe_all(node) {
+    return new Promise(async (resolve, reject) => {
+        let date_start = new Date();
+        const test_name = 'node_websocket_test_subscribe_all';
+        try {
+            let setup_success = await node.websocket.setup_promise();
+            if (setup_success != true) {
+                resolve(node_test_complete(node, test_name, (new Date() - date_start), TEST_SCORE['fail'], response.data));
+                return;
+            }
+            date_start = new Date();
+            node.websocket.subscribe_all((response) => {
+                let test_score = TEST_SCORE['fail'];
+                if (response.success == false && response.message !== undefined && response.data !== undefined && response.data.message === undefined) {
+                    response.data.message = response.message;
+                }
+                if (response.success == true && response.data !== undefined && response.data.ack == 'subscribe'){
+                    node.websocket.unsubscribe_all();
+                    test_score = TEST_SCORE['pass'];
+                }
+                resolve(node_test_complete(node, test_name, (new Date() - date_start), test_score, response.data));
+                return;
+            });
+        } catch(error) {
+            resolve(node_test_error(node, test_name, (new Date() - date_start), error));
+            return;
+        }
+    });
+}
+
+function node_websocket_test_subscribe_addresses(node) {
+    return new Promise(async (resolve, reject) => {
+        let date_start = new Date();
+        const test_name = 'node_websocket_test_subscribe_addresses';
+        try {
+            let setup_success = await node.websocket.setup_promise();
+            if (setup_success != true) {
+                resolve(node_test_complete(node, test_name, (new Date() - date_start), TEST_SCORE['fail'], response.data));
+                return;
+            }
+            date_start = new Date();
+            node.websocket.subscribe_addresses([TEST_VALID_ACCOUNT], (response) => {
+                let test_score = TEST_SCORE['fail'];
+                if (response.success == false && response.message !== undefined && response.data !== undefined && response.data.message === undefined) {
+                    response.data.message = response.message;
+                }
+                if (response.success == true && response.data !== undefined && response.data.ack == 'subscribe') {
+                    test_score = TEST_SCORE['pass'];
+                    node.websocket.unsubscribe_addresses([TEST_VALID_ACCOUNT]);
+                }
+                resolve(node_test_complete(node, test_name, (new Date() - date_start), test_score, response.data));
+                return;
+            });
+        } catch(error) {
+            resolve(node_test_error(node, test_name, (new Date() - date_start), error));
+            return;
+        }
     });
 }

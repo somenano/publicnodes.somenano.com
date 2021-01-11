@@ -45,7 +45,7 @@
                 <thead>
                     <tr>
                         <th data-field="name" data-formatter="formatter_name" data-cell-style="name_cell_style" rowspan="2" data-sortable="true">Name</th>
-                        <th colspan="5">Tests</th>
+                        <th colspan="9">Tests</th>
                         <th data-field="comment" rowspan="2" data-formatter="formatter_comment" data-sortable="true">Comments</th>
                     </tr>
                     <tr>
@@ -54,6 +54,11 @@
                         <th class="fs-0-7" data-field="node_api_test_process" data-formatter="formatter_node_api_test_process" data-cell-style="test_cell_style" data-sortable="true">API Supports<br>"process"</th>
                         <th class="fs-0-7" data-field="node_api_test_work" data-formatter="formatter_node_api_test_work" data-cell-style="test_cell_style" data-sortable="true">API Supports<br>"work_generate"</th>
                         <th class="fs-0-7" data-field="node_api_test_token" data-formatter="formatter_node_api_test_token" data-cell-style="test_cell_style" data-sortable="true">Token Limited</th>
+                        <th class="fs-0-7" data-field="node_websocket_test_setup" data-formatter="formatter_node_websocket_test_setup" data-cell-style="test_cell_style" data-sortable="true">WebSocket<br>Setup</th>
+                        <th class="fs-0-7" data-field="node_websocket_test_ping" data-formatter="formatter_node_websocket_test_ping" data-cell-style="test_cell_style" data-sortable="true">WebSocket<br>Ping</th>
+                        <th class="fs-0-7" data-field="node_websocket_test_subscribe_all" data-formatter="formatter_node_websocket_test_subscribe_all" data-cell-style="test_cell_style" data-sortable="true">WebSocket<br>Subscribe<br>All</th>
+                        <th class="fs-0-7" data-field="node_websocket_test_subscribe_addresses" data-formatter="formatter_node_websocket_test_subscribe_addresses" data-cell-style="test_cell_style" data-sortable="true">WebSocket<br>Subscribe<br>Addresses</th>
+
                         <!-- <th class="fs-0-7" data-field="node_websockets_test_available" data-cell-style="test_cell_style" data-sortable="true">Websockets<br>Available</th>
                         <th class="fs-0-7" data-field="node_websockets_test_voting" data-cell-style="test_cell_style" data-sortable="true">Websockets<br>Voting</th> -->
                         
@@ -85,6 +90,11 @@
                     <p><span class="font-weight-bold">API Supports "process":</span> Queries the node with <a href="https://docs.nano.org/commands/rpc-protocol/#process" target="_new">action: process</a> and checks that the node returns an error message indicating it attempted to process the block. I am not attempting to broadcast legitimate blocks for these tests.</p>
                     <p><span class="font-weight-bold">API Supports "work_generate":</span> Queries the node with <a href="https://docs.nano.org/commands/rpc-protocol/#work_generate" target="_new">action: work_generate</a> and checks for a returned work value. Many public nodes won't support this action because of the processing power costs. Some that allow limit requests via tokens/time will charge more than for a work_generate call than any other.</p>
                     <p><span class="font-weight-bold">Token Limited:</span> Queries the node with an arbitrary action and looks to see if a known token system is in use. Some public nodes use tokens (likely those that have implemented the <a href="https://github.com/Joohansson/NanoRPCProxy" target="_new">NanoRPCProxy</a> to prevent abuse of their free-to-use public node. In this test I check for the response data to include a value for requestsLimit.</p>
+                    <p><span class="font-weight-bold">WebSocket Setup:</span> Attempts to connect to the WebSocket provided.</p>
+                    <p><span class="font-weight-bold">WebSocket Ping:</span> Messages the WebSocket with a ping message as defined <a href="https://docs.nano.org/integration-guides/websockets/#keepalive" target="_new">in the Nano docs</a>. Watches for pong message back with corresponding id.</p>
+                    <p><span class="font-weight-bold">WebSocket Subscribe All:</span> Messages the WebSocket with a a request to subscribe to confirmations (confirmation_type=active) without specifying any particular addresses, as shown in <a href="https://docs.nano.org/integration-guides/websockets/#subscribeunsubscribe" target="_new">in the Nano docs</a>. Watches for "ack" message back with corresponding id.</p>
+                    <p><span class="font-weight-bold">WebSocket Subscribe Addresses:</span> Messages the WebSocket with a subscribe to confirmations (confirmation_type=active) for one specific address, as shown in <a href="https://docs.nano.org/integration-guides/websockets/#subscribeunsubscribe" target="_new">in the Nano docs</a>. Watches for "ack" message back with corresponding id.</p>
+                    
                     <p class="text-center">Please note all tests error out after 10 seconds of no response.</p>
                   </div>
               </div>
@@ -146,7 +156,6 @@
                           <ul>
                               <li>Make it prettier (help?)</li>
                               <li>Add an RPC Playground</li>
-                              <li>Add node WebSocket testing</li>
                               <li>Expand the number of actions tested</li>
                               <li>Integrate a faucet to enable testing with funds</li>
                               <li>Provide better "benchmark" testing</li>

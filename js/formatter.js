@@ -45,8 +45,22 @@ function limited_message(value) {
     return '<div class="fs-0-7">This node is rate limiting your requests, try again later</div>';
 }
 
+function running_test_message(value) {
+    return '<div class="text-center"><img src="/images/nano.gif" height="32px" width="43px"></div><div class="text-center tiny-muted">Running test...</div>';
+}
+
+function results_true_false_message(value) {
+    let ret = '<div class="fs-0-7">';
+    if (value.test_score == TEST_SCORE['pass']) ret += 'Pass';
+    else ret += 'Fail';
+    ret += '</div>';
+    if (value.test_data.message !== undefined) ret += '<div class="fs-0-5">'+ value.test_data.message +'</div>';
+    ret += '<div class="tiny-muted">' + value.test_duration + ' ms</div>';
+    return ret;
+}
+
 function formatter_node_api_test_version(value, row, index) {
-    if (value === undefined) return '<div class="text-center"><img src="/images/nano.gif" height="32px" width="43px"></div><div class="text-center tiny-muted">Running test...</div>';
+    if (value === undefined) return running_test_message(value);
     if (value.test_score == TEST_SCORE['error']) {
         return error_message(value);
     }
@@ -58,7 +72,7 @@ function formatter_node_api_test_version(value, row, index) {
 }
 
 function formatter_node_api_test_blocks(value, row, index) {
-    if (value === undefined) return '<div class="text-center"><img src="/images/nano.gif" height="32px" width="43px"></div><div class="text-center tiny-muted">Running test...</div>';
+    if (value === undefined) return running_test_message(value);
     if (value.test_score == TEST_SCORE['error']) {
         return error_message(value);
     }
@@ -74,7 +88,7 @@ function formatter_node_api_test_blocks(value, row, index) {
 }
 
 function formatter_node_api_test_process(value, row, index) {
-    if (value === undefined) return '<div class="text-center"><img src="/images/nano.gif" height="32px" width="43px"></div><div class="text-center tiny-muted">Running test...</div>';
+    if (value === undefined) return running_test_message(value);
     if (value.test_score == TEST_SCORE['error']) {
         return error_message(value);
     }
@@ -82,15 +96,11 @@ function formatter_node_api_test_process(value, row, index) {
         return limited_message(value);
     }
     
-    let ret = '<div class="fs-0-7">';
-    if (value.test_score == TEST_SCORE['pass']) ret += 'True';
-    else ret += 'False';
-    ret += '</div><div class="tiny-muted">' + value.test_duration + ' ms</div>';
-    return ret;
+    return results_true_false_message(value);
 }
 
 function formatter_node_api_test_work(value, row, index) {
-    if (value === undefined) return '<div class="text-center"><img src="/images/nano.gif" height="32px" width="43px"></div><div class="text-center tiny-muted">Running test...</div>';
+    if (value === undefined) return running_test_message(value);
     if (value.test_score == TEST_SCORE['error']) {
         return error_message(value);
     }
@@ -98,15 +108,11 @@ function formatter_node_api_test_work(value, row, index) {
         return limited_message(value);
     }
 
-    let ret = '<div class="fs-0-7">';
-    if (value.test_score == TEST_SCORE['pass']) ret += 'True';
-    else ret += 'False';
-    ret += '</div><div class="tiny-muted">' + value.test_duration + ' ms</div>';
-    return ret;
+    return results_true_false_message(value);
 }
 
 function formatter_node_api_test_token(value, row, index) {
-    if (value === undefined) return '<div class="text-center"><img src="/images/nano.gif" height="32px" width="43px"></div><div class="text-center tiny-muted">Running test...</div>';
+    if (value === undefined) return running_test_message(value);
     if (value.test_score == TEST_SCORE['error']) {
         return error_message(value);
     }
@@ -119,6 +125,58 @@ function formatter_node_api_test_token(value, row, index) {
     else ret += 'No tokens detected';
     ret += '</div><div class="tiny-muted">' + value.test_duration + ' ms</div>';
     return ret;
+}
+
+function formatter_node_websocket_test_setup(value, row, index) {
+    if (row.ws === undefined) return undefined;
+    if (value === undefined) return running_test_message(value);
+    if (value.test_score == TEST_SCORE['error']) {
+        return error_message(value);
+    }
+    if (value.test_score == TEST_SCORE['limited']) {
+        return limited_message(value);
+    }
+
+    return results_true_false_message(value);
+}
+
+function formatter_node_websocket_test_ping(value, row, index) {
+    if (row.ws === undefined) return undefined;
+    if (value === undefined) return running_test_message(value);
+    if (value.test_score == TEST_SCORE['error']) {
+        return error_message(value);
+    }
+    if (value.test_score == TEST_SCORE['limited']) {
+        return limited_message(value);
+    }
+
+    return results_true_false_message(value);
+}
+
+function formatter_node_websocket_test_subscribe_all(value, row, index) {
+    if (row.ws === undefined) return undefined;
+    if (value === undefined) return running_test_message(value);
+    if (value.test_score == TEST_SCORE['error']) {
+        return error_message(value);
+    }
+    if (value.test_score == TEST_SCORE['limited']) {
+        return limited_message(value);
+    }
+
+    return results_true_false_message(value);
+}
+
+function formatter_node_websocket_test_subscribe_addresses(value, row, index) {
+    if (row.ws === undefined) return undefined;
+    if (value === undefined) return running_test_message(value);
+    if (value.test_score == TEST_SCORE['error']) {
+        return error_message(value);
+    }
+    if (value.test_score == TEST_SCORE['limited']) {
+        return limited_message(value);
+    }
+
+    return results_true_false_message(value);
 }
 
 
