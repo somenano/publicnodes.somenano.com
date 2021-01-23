@@ -54,7 +54,11 @@ function results_true_false_message(value) {
     if (value.test_score == TEST_SCORE['pass']) ret += 'Pass';
     else ret += 'Fail';
     ret += '</div>';
-    if (value.test_data.message !== undefined) ret += '<div class="fs-0-5">'+ value.test_data.message +'</div>';
+    if (value.test_data.timeout !== undefined && value.test_duration !== undefined && value.test_data.timeout <= value.test_duration) {
+        ret += '<div class="fs-0-5">Test timed out</div>';
+    }
+    else if (value.test_data.error !== undefined) ret += '<div class="fs-0-5">' + value.test_data.error + '</div>';
+    else if (value.test_data.message !== undefined) ret += '<div class="fs-0-5">'+ value.test_data.message +'</div>';
     ret += '<div class="tiny-muted">' + value.test_duration + ' ms</div>';
     return ret;
 }
@@ -66,6 +70,9 @@ function formatter_node_api_test_version(value, row, index) {
     }
     if (value.test_score == TEST_SCORE['limited']) {
         return limited_message(value);
+    }
+    if (value.test_score == TEST_SCORE['fail']) {
+        return results_true_false_message(value);
     }
 
     return '<div class="fs-0-7">' + value.test_data.node_vendor + '</div><div class="tiny-muted">' + value.test_duration + ' ms</div>';

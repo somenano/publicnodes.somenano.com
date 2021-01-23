@@ -112,8 +112,9 @@ function node_api_test(node, test_name, api_promise, validation_function) {
 function node_api_test_version(node) {
     return node_api_test(node, 'node_api_test_version', node.api.version(), function(data) {
         if (data.status == 429 || data.requestsRemaining == 0) return TEST_SCORE['limited'];   // Too many requests
-        if (data.status !== undefined) return TEST_SCORE['error'];
-        if (data.node_vendor === undefined && data.requestsLimit === undefined) return TEST_SCORE['error'];
+        if (data.error !== undefined) return TEST_SCORE['fail'];    // ex: {"error":"Action xyz not allowed"}
+        if (data.status !== undefined) return TEST_SCORE['error'];  // HTTP status detected
+        if (data.node_vendor === undefined && data.requestsLimit === undefined) return TEST_SCORE['fail'];
         if (data.node_vendor == CURRENT_NODE_VENDOR) return TEST_SCORE['pass'];
         return TEST_SCORE['partial'];
     });
@@ -122,8 +123,9 @@ function node_api_test_version(node) {
 function node_api_test_blocks(node) {
     return node_api_test(node, 'node_api_test_blocks', node.api.block_count(), function(data) {
         if (data.status == 429 || data.requestsRemaining == 0) return TEST_SCORE['limited'];   // Too many requests
-        if (data.status !== undefined) return TEST_SCORE['error'];
-        if (data.unchecked === undefined && data.requestsLimit === undefined) return TEST_SCORE['error'];
+        if (data.error !== undefined) return TEST_SCORE['fail'];    // ex: {"error":"Action xyz not allowed"}
+        if (data.status !== undefined) return TEST_SCORE['error'];  // HTTP status detected
+        if (data.unchecked === undefined && data.requestsLimit === undefined) return TEST_SCORE['fail'];
         if (Number(data.unchecked) > UNCHECKED_BLOCKS_FAIL) return TEST_SCORE['fail'];
         if (Number(data.unchecked) > UNCHECKED_BLOCKS_PARTIAL) return TEST_SCORE['partial'];
         return TEST_SCORE['pass'];
@@ -134,8 +136,10 @@ function node_api_test_process(node) {
     const block = NodeAPI.block('send', TEST_INVALID_ACCOUNT, TEST_HASH, TEST_INVALID_ACCOUNT, '0', TEST_HASH, TEST_INVALID_ACCOUNT, TEST_SIGNATURE, TEST_WORK)
     return node_api_test(node, 'node_api_test_process', node.api.process(true, 'send', block), function(data) {
         if (data.status == 429 || data.requestsRemaining == 0) return TEST_SCORE['limited'];   // Too many requests
-        if (data.status !== undefined) return TEST_SCORE['error'];
-        if (data.hash === undefined && data.error === undefined && data.requestsLimit === undefined) return TEST_SCORE['error'];
+        if (data.status !== undefined) return TEST_SCORE['error'];  // HTTP status detected
+        // This test is meant to fail, "Block is invalid"
+        // if (data.error !== undefined) return TEST_SCORE['fail'];    // ex: {"error":"Action xyz not allowed"}
+        if (data.hash === undefined && data.error === undefined && data.requestsLimit === undefined) return TEST_SCORE['fail'];
         if (data.error == 'Block is invalid') return TEST_SCORE['pass'];
         return TEST_SCORE['fail'];
     });
@@ -144,8 +148,9 @@ function node_api_test_process(node) {
 function node_api_test_work(node) {
     return node_api_test(node, 'node_api_test_work', node.api.work_generate(TEST_HASH), function(data) {
         if (data.status == 429 || data.requestsRemaining == 0) return TEST_SCORE['limited'];   // Too many requests
-        if (data.status !== undefined) return TEST_SCORE['error'];
-        if (data.work === undefined && data.error === undefined && data.requestsLimit === undefined) return TEST_SCORE['error'];
+        if (data.error !== undefined) return TEST_SCORE['fail'];    // ex: {"error":"Action xyz not allowed"}
+        if (data.status !== undefined) return TEST_SCORE['error'];  // HTTP status detected
+        if (data.work === undefined && data.error === undefined && data.requestsLimit === undefined) return TEST_SCORE['fail'];
         if (data.work !== undefined) return TEST_SCORE['pass'];
         return TEST_SCORE['fail'];
     });
@@ -154,8 +159,9 @@ function node_api_test_work(node) {
 function node_api_test_token(node) {
     return node_api_test(node, 'node_api_test_token', node.api.block_count(), function(data) {
         if (data.status == 429 || data.requestsRemaining == 0) return TEST_SCORE['limited'];   // Too many requests
-        if (data.status !== undefined) return TEST_SCORE['error'];
-        if (data.unchecked === undefined && data.requestsLimit === undefined) return TEST_SCORE['error'];
+        if (data.error !== undefined) return TEST_SCORE['fail'];    // ex: {"error":"Action xyz not allowed"}
+        if (data.status !== undefined) return TEST_SCORE['error'];  // HTTP status detected
+        if (data.unchecked === undefined && data.requestsLimit === undefined) return TEST_SCORE['fail'];
         if (data.requestsLimit !== undefined) return TEST_SCORE['pass'];
         return TEST_SCORE['fail'];
     });

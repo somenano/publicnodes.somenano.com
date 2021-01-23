@@ -83,13 +83,37 @@ NodeAPI.post = function(url, params, success_cb, fail_cb) {
         if (this.readyState == 4 && this.status == 200) {
             try {
                 success_cb(JSON.parse(this.responseText));
+                return;
             } catch(e) {
                 console.error('Failed to parse response from node');
                 console.error(this.responseText);
-                fail_cb(this);
+                fail_cb({error: 'Unable to parse response', timeout: this.timeout});
+                return;
             }
         } else if (this.readyState == 4 && this.status != 200) {
-            fail_cb(this);
+            if (this.responseText !== undefined) {
+                try {
+                    fail_cb(JSON.parse(this.responseText));
+                    return;
+                } catch(e) {
+                    console.error('Failed to parse response from node');
+                    console.error(this.responseText);
+                    if (this.status !== undefined && this.status > 0) {
+                        fail_cb({error: 'Request returned HTTP '+ this.status, timeout: this.timeout});
+                        return;
+                    } else {
+                        fail_cb({error: 'Request failed', timeout: this.timeout});
+                        return;
+                    }
+                }
+            }
+            if (this.status !== undefined && this.status > 0) {
+                fail_cb({error: 'Request returned HTTP '+ this.status, timeout: this.timeout});
+                return;
+            } else {
+                fail_cb({error: 'Request timed out', timeout: this.timeout});
+                return;
+            }
         }
     };
     xhttp.open("POST", url, true);
