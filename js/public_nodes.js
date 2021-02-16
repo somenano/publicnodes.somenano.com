@@ -36,5 +36,11 @@ const public_nodes = [
         url: 'https://vault.nanocrawler.cc/api/node-api',
         ws: undefined,
         comment: '<a href="https://twitter.com/meltingice" target="_new">@MeltingIce</a>'
+    },
+    {
+        name: 'PowerNode API',
+        url: 'https://proxy.powernode.cc/proxy',
+        ws: 'wss://ws.powernode.cc',
+        comment: 'Learn more: <a href="https://powernode.cc/api" target="_new">https://powernode.cc/api</a>'
     }
 ]
