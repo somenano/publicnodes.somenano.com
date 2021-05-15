@@ -13,12 +13,12 @@ const public_nodes = [
         ws: 'wss://nault-ws.nanos.cc',
         comment: 'Learn more: <a href="https://api.nanos.cc/" target="_new">https://api.nanos.cc/</a>'
     },
-    {
-        name: 'VoxPopuli',
-        url: 'https://vox.nanos.cc/api',
-        ws: 'wss://vox.nanos.cc/websocket',
-        comment: ''
-    },
+    // {
+    //     name: 'VoxPopuli',
+    //     url: 'https://vox.nanos.cc/api',
+    //     ws: 'wss://vox.nanos.cc/websocket',
+    //     comment: ''
+    // },
     {
         name: 'My Nano Ninja',
         url: 'https://mynano.ninja/api/node',
@@ -42,5 +42,11 @@ const public_nodes = [
         url: 'https://proxy.powernode.cc/proxy',
         ws: 'wss://ws.powernode.cc',
         comment: 'Learn more: <a href="https://powernode.cc/api" target="_new">https://powernode.cc/api</a>'
+    },
+    {
+        name: 'Rainstorm City',
+        url: 'https://rainstorm.city/api',
+        ws: 'wss://rainstorm.city/websocket',
+        comment: 'Learn more: <a href="https://rainstorm.city/" target="_new">https://rainstorm.city</a>'
     }
 ]
