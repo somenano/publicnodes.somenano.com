@@ -9,8 +9,8 @@ const public_nodes = [
     },
     {
         name: 'Nanos.cc',
-        url: 'https://nault.nanos.cc/proxy',
-        ws: 'wss://nault-ws.nanos.cc',
+        url: 'https://proxy.nanos.cc/proxy',
+        ws: 'wss://socket.nanos.cc',
         comment: 'Learn more: <a href="https://api.nanos.cc/" target="_new">https://api.nanos.cc/</a>'
     },
     // {
