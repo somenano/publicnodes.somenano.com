@@ -26,12 +26,6 @@ const public_nodes = [
         comment: 'Learn more: <a href="https://mynano.ninja/api" target="_new">https://mynano.ninja/api</a>'
     },
     {
-        name: 'Nanex.cc',
-        url: 'https://api.nanex.cc',
-        ws: undefined,
-        comment: ''
-    },
-    {
         name: 'NanoCrawler',
         url: 'https://vault.nanocrawler.cc/api/node-api',
         ws: undefined,
