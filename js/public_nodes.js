@@ -13,12 +13,12 @@ const public_nodes = [
         ws: 'wss://socket.nanos.cc',
         comment: 'Learn more: <a href="https://api.nanos.cc/" target="_new">https://api.nanos.cc/</a>'
     },
-    // {
-    //     name: 'VoxPopuli',
-    //     url: 'https://vox.nanos.cc/api',
-    //     ws: 'wss://vox.nanos.cc/websocket',
-    //     comment: ''
-    // },
+    {
+        name: 'bitrequest',
+        url: 'https://www.bitrequest.app:8020',
+        ws: 'wss://bitrequest.app:8010',
+        comment: ''
+    },
     {
         name: 'My Nano Ninja',
         url: 'https://mynano.ninja/api/node',
