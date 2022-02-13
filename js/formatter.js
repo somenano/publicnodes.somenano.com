@@ -106,6 +106,18 @@ function formatter_node_api_test_process(value, row, index) {
     return results_true_false_message(value);
 }
 
+function formatter_node_api_test_receivable(value, row, index) {
+    if (value === undefined) return running_test_message(value);
+    if (value.test_score == TEST_SCORE['error']) {
+        return error_message(value);
+    }
+    if (value.test_score == TEST_SCORE['limited']) {
+        return limited_message(value);
+    }
+    
+    return results_true_false_message(value);
+}
+
 function formatter_node_api_test_work(value, row, index) {
     if (value === undefined) return running_test_message(value);
     if (value.test_score == TEST_SCORE['error']) {

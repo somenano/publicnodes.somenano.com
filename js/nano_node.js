@@ -65,6 +65,14 @@ class NodeAPI {
             'hash': hash
         });
     }
+
+    receivable(account) {
+        return this.call({
+            'action': 'receivable',
+            'account': account,
+            'count': 1
+        });
+    }
 }
 
 NodeAPI.post = function(url, params, success_cb, fail_cb) {

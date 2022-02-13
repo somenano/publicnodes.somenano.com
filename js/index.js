@@ -65,6 +65,14 @@ function data_refresh() {
         });
 
         ///////////////
+        // node_api_test_receivable
+        //
+        node_api_test_receivable(node)
+        .then((results) => {
+            update_table_test(node, results);
+        });
+
+        ///////////////
         // node_api_test_work
         //
         node_api_test_work(node)

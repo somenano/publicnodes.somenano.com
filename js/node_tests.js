@@ -167,6 +167,17 @@ function node_api_test_token(node) {
     });
 }
 
+function node_api_test_receivable(node) {
+    return node_api_test(node, 'node_api_test_receivable', node.api.receivable(TEST_VALID_ACCOUNT), function(data) {
+        if (data.status == 429 || data.requestsRemaining == 0) return TEST_SCORE['limited'];   // Too many requests
+        if (data.error !== undefined) return TEST_SCORE['fail'];    // ex: {"error":"Action xyz not allowed"}
+        if (data.status !== undefined) return TEST_SCORE['error'];  // HTTP status detected
+        if (data.blocks === undefined && data.requestsLimit === undefined) return TEST_SCORE['fail'];
+        if (data.requestsLimit !== undefined) return TEST_SCORE['pass'];
+        return TEST_SCORE['fail'];
+    });
+}
+
 function node_websocket_test_setup(node) {
     return new Promise(async (resolve, reject) => {
         const date_start = new Date();
