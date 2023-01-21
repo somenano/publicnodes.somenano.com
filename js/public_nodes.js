@@ -26,12 +26,6 @@ const public_nodes = [
         comment: 'Learn more: <a href="https://mynano.ninja/api" target="_new">https://mynano.ninja/api</a>'
     },
     {
-        name: 'NanoCrawler',
-        url: 'https://vault.nanocrawler.cc/api/node-api',
-        ws: undefined,
-        comment: '<a href="https://twitter.com/meltingice" target="_new">@MeltingIce</a>'
-    },
-    {
         name: 'PowerNode API',
         url: 'https://proxy.powernode.cc/proxy',
         ws: 'wss://ws.powernode.cc',
