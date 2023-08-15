@@ -36,5 +36,11 @@ const public_nodes = [
         url: 'https://rainstorm.city/api',
         ws: 'wss://rainstorm.city/websocket',
         comment: 'Learn more: <a href="https://rainstorm.city/" target="_new">https://rainstorm.city</a>'
+    },
+    {
+        name: 'NanOslo',
+        url: 'https://nanoslo.0x.no/proxy',
+        ws: 'wss://nanoslo.0x.no/websocket',
+        comment: 'Learn more: <a href="https://nanoslo.0x.no" target="_new">https://nanoslo.0x.no</a>'
     }
 ]
