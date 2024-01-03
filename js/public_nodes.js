@@ -20,18 +20,6 @@ const public_nodes = [
         comment: ''
     },
     {
-        name: 'My Nano Ninja',
-        url: 'https://mynano.ninja/api/node',
-        ws: 'wss://ws.mynano.ninja',
-        comment: 'Learn more: <a href="https://mynano.ninja/api" target="_new">https://mynano.ninja/api</a>'
-    },
-    {
-        name: 'PowerNode API',
-        url: 'https://proxy.powernode.cc/proxy',
-        ws: 'wss://ws.powernode.cc',
-        comment: 'Learn more: <a href="https://powernode.cc/api" target="_new">https://powernode.cc/api</a>'
-    },
-    {
         name: 'Rainstorm City',
         url: 'https://rainstorm.city/api',
         ws: 'wss://rainstorm.city/websocket',
