@@ -8,12 +8,6 @@ const public_nodes = [
         comment: 'Learn more: <a href="https://node.somenano.com" target="_new">https://node.somenano.com</a>'
     },
     {
-        name: 'Nanos.cc',
-        url: 'https://proxy.nanos.cc/proxy',
-        ws: 'wss://socket.nanos.cc',
-        comment: 'Learn more: <a href="https://api.nanos.cc/" target="_new">https://api.nanos.cc/</a>'
-    },
-    {
         name: 'bitrequest',
         url: 'https://www.bitrequest.app:8020',
         ws: 'wss://bitrequest.app:8010',
