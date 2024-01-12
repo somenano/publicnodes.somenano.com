@@ -1,4 +1,4 @@
-// Want your pubic Nano node added to this site? Email me (jason@somenano.com) or find me on Twitter @SomeNanoTweets
+// Want your public Nano node added to this site? Email me (jason@somenano.com) or find me on Twitter @SomeNanoTweets
 
 const public_nodes = [
     {
