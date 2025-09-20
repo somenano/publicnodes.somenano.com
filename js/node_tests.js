@@ -2,7 +2,7 @@
 // Test configurations, these need updated as new versions release
 //
 
-const CURRENT_NODE_VENDOR = 'Nano V28.0';
+const CURRENT_NODE_VENDOR = 'Nano V28.2';
 const UNCHECKED_BLOCKS_PARTIAL = 50;
 const UNCHECKED_BLOCKS_FAIL = 100;
 const TEST_HASH = '718CC2121C3E641059BC1C2CFC45666C99E8AE922F7A807B7D07B62C995D79E2';
